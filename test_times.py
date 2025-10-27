@@ -1,4 +1,5 @@
 from times import time_range,compute_overlap_time
+import pytest
 
 def test_given_input():
     large = time_range("2010-01-12 10:00:00", "2010-01-12 12:00:00")
@@ -41,4 +42,20 @@ def test_single_overlap():
     
     result = compute_overlap_time(range1, range2)
     expected = [('2022-01-01 11:00:00', '2022-01-01 11:00:00')]
+    assert result == expected
+
+
+def test_invalid_time_range():
+    # tests with invalid time ranges
+    start_time = "2022-01-01 12:00:00"
+    end_time = "2022-01-01 10:00:00"
+    with pytest.raises(ValueError, match= "end_time must be after start_time"):
+        time_range(start_time, end_time)  # should raise ValueError, specific to specific error
+
+
+
+@pytest.mark.parametrize("range1, range2, expected", [(time_range("2022-01-01 10:00:00", "2022-01-01 11:00:00"),time_range("2022-01-01 14:00:00", "2022-01-01 15:00:00"),[]),
+                                                      (time_range("2022-01-01 10:00:00", "2022-01-01 11:00:00"),time_range("2022-01-01 11:00:00", "2022-01-01 13:00:00"),[('2022-01-01 11:00:00', '2022-01-01 11:00:00')])])
+def tests_parameterised(range1, range2, expected):
+    result = compute_overlap_time(range1, range2)
     assert result == expected
